@@ -83,7 +83,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist"
+        "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration phpunit.xml.dist"
     },
     "conflict": {
         "symfony/symfony": "*"
