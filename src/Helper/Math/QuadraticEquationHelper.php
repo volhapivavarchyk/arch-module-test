@@ -9,13 +9,13 @@ class  QuadraticEquationHelper
     /**
      * @return array<float>
      */
-    public static function solve(float $a, float $b, float $c): array
+    public static function solve(float $a, float $b, float $c, float $e = 1.0E-5): array
     {
-        if ($a == 0) {
+        if (abs($a) < $e) {
             throw new \Exception('The first coefficient can not be zero');
         }
 
-        if ($b == 0) {
+        if (abs($b) < $e) {
             if ((-$c/$a) < 0) {
                 return [];
             }
@@ -25,7 +25,7 @@ class  QuadraticEquationHelper
             return [$x, -$x];
         }
 
-        if ($c == 0) {
+        if (abs($c) < $e) {
             return [0, round(-$b/$a, 2)];
         }
 
@@ -35,13 +35,8 @@ class  QuadraticEquationHelper
             return [];
         }
 
-        if ($d == 0) {
-            if ((-$c/$a) < 0) {
-                return [];
-            }
-
-            $x = round(sqrt(-$c/$a), 2);
-//            $x = round((-$b + sqrt($d)) / 2 * $a, 2);
+        if (abs($d) < $e) {
+            $x = round(-$b / 2 * $a, 2);
 
             return [$x, $x];
         }
