@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Helper\Math;
 
+use Exception;
+
 class  QuadraticEquationHelper
 {
     /**
      * @return array<float>
+     * @throws Exception
      */
     public static function solve(float $a, float $b, float $c, float $e = 1.0E-5): array
     {
         if (abs($a) < $e) {
-            throw new \Exception('The first coefficient can not be zero');
+            throw new Exception('The first coefficient can not be zero');
         }
 
         if (abs($b) < $e) {

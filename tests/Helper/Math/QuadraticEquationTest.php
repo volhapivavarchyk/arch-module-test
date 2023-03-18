@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Helper\Math;
 
 use App\Helper\Math\QuadraticEquationHelper;
+use Exception;
 use Generator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -18,21 +19,22 @@ class QuadraticEquationTest extends TestCase
 
     public function testSolveFirstCoefficientNoZero(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('The first coefficient can not be zero');
 
-        $result = QuadraticEquationHelper::solve(0, 1, 1);
+        $result = QuadraticEquationHelper::solve(1e-7, 1, 1);
     }
 
     /**
      * @dataProvider dataProvider
      * @return void
+     * @throws Exception
      */
-    public function testSolveIncompleteQuadraticEquationNoDiscriminant(array $input, array $expected): void
+    public function testSolve(array $input, array $expected): void
     {
         $result = QuadraticEquationHelper::solve(...$input);
 
-        Assert::assertEquals($result, $expected);
+        Assert::assertEquals($expected, $result);
     }
 
     /**
@@ -45,5 +47,6 @@ class QuadraticEquationTest extends TestCase
         yield [[2, 0, -1], [0.71, -0.71]];
         yield [[1, -7, 0], [0, 7]];
         yield [[1, 2, 1], [-1, -1]];
+        yield [[1, -2, -3], [3, -1]];
     }
 }
