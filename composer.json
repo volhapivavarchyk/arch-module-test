@@ -1,4 +1,6 @@
 {
+    "name": "pv/tests",
+    "description": "Architecture and design patterns. Module tests",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
