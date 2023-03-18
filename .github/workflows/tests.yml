@@ -1,0 +1,78 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+  pull_request:
+  schedule:
+    # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
+    - cron: '45 10 * * *'
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['8.0']
+        db-types: ['mysql']
+
+    name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
+
+    services:
+      database:
+        image: ${{ matrix.db-types == 'mysql' && 'mysql:8.0'}}
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: dbtest
+        ports:
+          - 3306
+        options: >-
+          --shm-size=2gb
+          --name=${{ matrix.db-types }}
+          --tmpfs=/var/lib/mysql
+          --health-cmd="mysqladmin ping" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+        # Codecov needs access to previous commits, so we add fetch-depth: 0
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
+          coverage: pcov
+          ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~"
+
+      - name: add MySQL config file
+        run: |
+          mysqldump --version
+          mysqldump --print-defaults
+          cp .github/ci-files/.my.cnf ~/.my.cnf
+          mysqldump --print-defaults
+
+      - name: Set SYMFONY_ENV to test
+        run: |
+          echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+          echo "MAUTIC_ENV=test" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          composer validate
+          composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run tests - database = ${{ matrix.db-types }}
+        run: |
+          export DB_PORT="${{ job.services.database.ports[3306] }}"
+          
+          if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
+            php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
+          else
+            composer test
+          fi
