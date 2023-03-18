@@ -9,6 +9,7 @@ use Exception;
 use Generator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 class QuadraticEquationTest extends TestCase
 {
@@ -48,5 +49,12 @@ class QuadraticEquationTest extends TestCase
         yield [[1, -7, 0], [0, 7]];
         yield [[1, 2, 1], [-1, -1]];
         yield [[1, -2, -3], [3, -1]];
+    }
+
+    public function testSolveNoCorrectType(): void
+    {
+        $this->expectException(TypeError::class);
+
+        $result = QuadraticEquationHelper::solve('abc', 'abc', 'abc');
     }
 }
