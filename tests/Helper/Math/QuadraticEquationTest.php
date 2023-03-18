@@ -41,9 +41,9 @@ class QuadraticEquationTest extends TestCase
     public function dataProvider(): Generator
     {
         yield [[2, 0, 1], []];
-//        yield [[2, 0, -1], [1, -1]];
+        yield [[1, 0, -1], [1, -1]];
         yield [[2, 0, -1], [0.71, -0.71]];
+        yield [[1, -7, 0], [0, 7]];
+        yield [[1, 2, 1], [-1, -1]];
     }
-
-
 }
